@@ -969,6 +969,7 @@ const CREW = [
   { isle:'kkday', name:'Taihua', tile:12, shirt:'#6E5A48', jacket:'#2A2A30', pants:'#26262B', shoe:'#1F1F1F', hair:'#1C1816', hairStyle:'up', wide:true },
   { isle:'kkday', name:'kiki-', tile:12, shirt:'#F7F4EE', print:{ w:.04, h:.035, c:'#E9B8A0', x:.02 }, skirt:'#1E1E22', dots:true, shoe:'#F4F1EA', hair:'#3A2A20', hairStyle:'long', glasses:true, lanyard:'#F4F1EA', badge:'#FFFFFF', pose:'peace' },
   { isle:'kkday', name:'forest', tile:13, shirt:'#1F2230', print:{ w:.05, h:.055, c:'#F2F0EC' }, pants:'#26324A', shoe:'#1F1F1F', hair:'#1C1816', hairStyle:'swept', glasses:true, lanyard:'#1A1A1A', badge:'#FFFFFF' },
+  { isle:'kkday', name:'志豪', tile:9, mode:'stand', at:'center', shirt:'#E6D3BC', hood:true, jacket:'#23283A', pants:'#5878A3', shoe:'#D9D6CF', hair:'#1C1816', hairStyle:'cap', cap:'#D8BF98', glasses:true, earphones:true, tote:true, pose:'laptop' },
   { isle:'kkday', name:'danny', tile:13, shirt:'#1F1F22', print:{ w:.04, h:.012, c:'#E3B23C', x:.02 }, pants:'#26262B', shoe:'#2A2A2A', hair:'#3A3430', hairStyle:'buzz', glasses:true, wide:true },
 ];
 const crew = [];
@@ -1001,6 +1002,8 @@ function character(o){
   if (o.lanyard){ const l1 = box(g, .005, .1, .005, o.lanyard, -.016, .18, .042); l1.rotation.z = -.3; const l2 = box(g, .005, .1, .005, o.lanyard, .016, .18, .042); l2.rotation.z = .3;
     box(g, .034, .046, .008, o.badge || '#2B2B30', 0, .135, .045); ball(g, .009, o.badge ? '#6FA8DC' : '#FFFFFF', 0, .158, .05, 0); }
   if (o.strap){ const st = box(g, .007, .19, .006, '#1A1A1A', 0, .12, .043); st.rotation.z = .65; }
+  if (o.earphones){ box(g, .004, .12, .004, '#FFFFFF', -.03, .2, .043).rotation.z = .15; box(g, .004, .12, .004, '#FFFFFF', .012, .2, .043).rotation.z = -.1; }
+  if (o.tote){ const tb = box(g, .06, .1, .035, '#A8A6A1', -.105, .04, .01); box(g, .062, .025, .037, '#2A2A2A', -.105, .04, .01); box(g, .006, .09, .006, '#2A2A2A', -.088, .13, .01); }
   if (o.hood){ box(g, .1, .05, .04, o.shirt, 0, .25, -.045); box(g, .004, .06, .004, '#E9EAEB', -.018, .2, .041); box(g, .004, .06, .004, '#E9EAEB', .018, .2, .041); }
   if (o.pendant){ box(g, .004, .05, .004, '#5A3A26', 0, .225, .041); box(g, .018, .028, .008, o.pendant, 0, .2, .043); }
   const arms = [];
@@ -1029,6 +1032,13 @@ function character(o){
   if (o.hairStyle === 'swept'){ const c = ball(head, .072, H, 0, .026, -.012, 1); c.scale.set(1.05, .82, 1.05); const f = box(head, .11, .04, .05, H, 0, .05, .03); f.rotation.x = -.35; }
   if (o.hairStyle === 'bobShort'){ const c = ball(head, .072, H, 0, .022, -.01, 1); c.scale.set(1.03, .8, 1);
     box(head, .145, .055, .06, H, 0, -.035, -.03); box(head, .02, .05, .045, H, -.066, -.03, .025); box(head, .02, .05, .045, H, .066, -.03, .025); }
+  if (o.hairStyle === 'cap'){
+    const crown = ball(head, .074, o.cap, 0, .03, -.008, 1); crown.scale.set(1.02, .78, 1.04);
+    const mesh_ = ball(head, .07, '#E7D6B8', 0, .025, -.03, 1); mesh_.scale.set(1.03, .74, .95);
+    const brim = box(head, .1, .012, .07, o.cap, 0, .035, .07); brim.rotation.x = .18;
+    box(head, .03, .02, .004, '#F4ECDD', 0, .06, .072);
+    box(head, .02, .03, .04, H, -.064, -.02, .01); box(head, .02, .03, .04, H, .064, -.02, .01);
+  }
   if (o.hairStyle === 'buzz'){ const c = ball(head, .068, H, 0, .018, -.008, 1); c.scale.set(1, .62, 1); }
   if (o.glasses){
     const gm = M('#2A2420');
@@ -1072,7 +1082,14 @@ CREW.forEach((o, i) => {
       c.toast = [-.022, .022].map(x => box(panIn, .035, .014, .035, '#E2B86A', x, .02, 0));
       const sp = box(c.arms[0], .012, .17, .006, '#8A5A35', 0, -.32, 0); box(c.arms[0], .03, .05, .005, '#8A5A35', 0, -.36, 0);
     }
-    if (o.mode === 'stand'){ const f = FACE_CAM(); c.g.position.set(-Math.sin(f) * .42, c.y, -Math.cos(f) * .42); c.g.rotation.y = f; }
+    if (o.mode === 'stand'){ const f = FACE_CAM(); const d = o.at === 'center' ? 0 : .42; c.g.position.set(-Math.sin(f) * d, c.y, -Math.cos(f) * d); c.g.rotation.y = f; }
+    if (o.pose === 'laptop'){
+      const lp = new THREE.Group(); lp.position.set(0, -.165, 0); lp.rotation.set(1.25, 0, -.35); c.arms[0].add(lp);
+      const lt = new THREE.Group(); lt.position.set(.04, .0, .04); lp.add(lt);
+      box(lt, .17, .008, .115, '#C9CDD2', 0, 0, 0); box(lt, .15, .002, .06, '#2A2A2E', 0, .008, -.012);
+      const scr = new THREE.Group(); scr.position.set(0, .008, .057); scr.rotation.x = .32; lt.add(scr);
+      box(scr, .17, .11, .006, '#C9CDD2', 0, 0, 0); box(scr, .155, .095, .002, glowMat, 0, .008, -.004);
+    }
     const walkers = CREW.filter(x => x.isle === o.isle && x.tile === o.tile && !x.mode);
     c.a = o.tile * 2.1 + walkers.indexOf(o) * Math.PI * 2 / Math.max(1, walkers.length);
   }
@@ -1084,6 +1101,7 @@ function posePose(c, t){
   switch (c.o.pose){
     case 'goggles': L.rotation.set(-2.75, 0, .55); R.rotation.set(-2.75, 0, -.55); c.head.rotation.x = Math.sin(t * 3) * .08; break;
     case 'cross': L.rotation.set(-1.2, 0, .85); R.rotation.set(-1.35, 0, -.85); break;
+    case 'laptop': L.rotation.set(-1.25, 0, .35); R.rotation.set(-2.75, 0, -.85 + Math.sin(t * 5) * .1); c.head.rotation.x = .38; break;
     case 'peace': L.rotation.set(0, 0, 0); R.rotation.set(0, 0, -2.5 + Math.sin(t * 6) * .12); break;
     default: L.rotation.set(0, 0, 0); R.rotation.set(0, 0, -2.6 + Math.sin(t * 8) * .35);
   }
@@ -1100,7 +1118,7 @@ function animateCrew(t, dt){
       continue;
     }
     if (c.o.mode === 'swing'){ c.pend.rotation.x = Math.sin(t * 2.1) * .38; c.head.rotation.y = Math.sin(t * .8) * .25; continue; }
-    if (c.o.mode === 'stand'){ posePose(c, t); c.head.rotation.y = Math.sin(t * 1.2 + c.off) * .35; c.g.position.y = c.y + Math.abs(Math.sin(t * 2)) * .006; continue; }
+    if (c.o.mode === 'stand'){ posePose(c, t); c.head.rotation.y = Math.sin(t * 1.2 + c.off) * (c.o.pose === 'laptop' ? .1 : .35); c.g.position.y = c.y + Math.abs(Math.sin(t * 2)) * .006; continue; }
     const ph = (t + c.off) % 9;
     const walking = ph < 6;
     if (walking) c.a += c.speed * dt;
