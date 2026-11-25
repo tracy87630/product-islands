@@ -1,0 +1,9 @@
+# 環境變數與金鑰
+.env
+.env.*
+
+# 套件
+node_modules/
+
+# 系統檔
+.DS_Store
