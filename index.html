@@ -952,6 +952,10 @@ const CREW = [
   { isle:'app91', name:'yo', tile:9, shirt:'#3A3836', print:{ w:.014, h:.012, c:'#FFFFFF', x:.025 }, pants:'#1F1F1F', short:true, sock:'#1F1F1F', shoe:'#1F1F1F', hair:'#3B2A20', hairStyle:'swept', glasses:true, wide:true },
   { isle:'app91', name:'arthur', tile:10, shirt:'#A9B7B8', pants:'#26324A', short:true, sock:'#26324A', shoe:'#222222', hair:'#1E1814', hairStyle:'pony', lanyard:'#1A1A1A' },
   { isle:'app91', name:'Tina', tile:10, shirt:'#2C2A28', print:{ w:.085, h:.022, c:'#F4F1EA' }, pants:'#5C7DA6', wideLeg:true, shoe:'#F4F1EA', hair:'#1E1A18', hairStyle:'bobShort', strap:true },
+  { isle:'app91', name:'sophie', tile:6, shirt:'#B8BDB1', knit:true, pants:'#55595C', wideLeg:true, shoe:'#3A3A3C', hair:'#2E211A', hairStyle:'bob', pose:'peace' },
+  { isle:'app91', name:'Abbie', tile:7, shirt:'#FBF8F2', print:{ w:.016, h:.014, c:'#E35D7A', x:.03 }, wide:true, pants:'#A9C0D6', wideLeg:true, shoe:'#9C3F33', hair:'#1E1714', hairStyle:'bob', pose:'kickpeace' },
+  { isle:'app91', name:'annie', tile:8, shirt:'#5A3825', pants:'#61666B', wideLeg:true, shoe:'#F1EDE6', shoeAccent:'#3E8C96', hair:'#C2672F', hairStyle:'bowl', hoops:true, lanyard:'#1A1A1A', badge:'#E23B2E', pose:'peace' },
+  { isle:'app91', name:'yuka', tile:9, shirt:'#F3EBDD', knit:true, skirt:'#AFC5DA', skirtPanel:'#8FA9C4', shoe:'#F4F1EA', hair:'#1E1714', hairStyle:'long', pose:'doublepeace' },
   /* Tracy 本人（Tracy 港） */
   { isle:'hub', name:'Tracy', self:true, tile:0, mode:'cook', shirt:'#C8CACC', hood:true, long:true, wide:true, print:{ w:.07, h:.016, c:'#B3B5B8' }, pants:'#2B3A5C', wideLeg:true, shoe:'#E6D5B6', chunky:true, hair:'#B4612E', hairStyle:'bob', scale:2.15 },
   /* KKday */
@@ -987,16 +991,19 @@ function character(o){
       if (o.short) box(leg, .044, .022, .048, o.sock, 0, -.128, 0);
     }
     box(leg, o.chunky ? .056 : .05, o.chunky ? .03 : .022, o.chunky ? .08 : .074, o.shoe, 0, -.137, .01);
+    if (o.shoeAccent) box(leg, .052, .01, .03, o.shoeAccent, 0, -.124, -.012);
     legs.push(leg);
   }
   if (o.skirt){
     mesh(g, new THREE.CylinderGeometry(.06, .09, .135, 10), o.skirt, 0, .07, 0);
+    if (o.skirtPanel){ const sp = box(g, .045, .13, .006, o.skirtPanel, .03, .005, .078); sp.rotation.x = -.2; }
     if (o.dots) for (let i = 0; i < 14; i++){ const a = i * 2.4, y = .02 + (i % 4) * .03, r = .09 - (y - .005) * .22; ball(g, .005, '#F4F1EA', Math.sin(a) * (r + .002), y + .005, Math.cos(a) * (r + .002), 0); }
   } else box(g, .12, .035, .066, o.pants, 0, .12, 0);
   const tw = o.wide ? .145 : .128;
   const outer = o.jacket || o.shirt;
   box(g, tw, .135, .078, outer, 0, .15, 0);
   if (o.jacket) box(g, .05, .13, .006, o.shirt, 0, .152, .04);
+  if (o.knit) for (let i = -2; i <= 2; i++) box(g, .006, .125, .004, '#' + new THREE.Color(o.shirt).multiplyScalar(.9).getHexString(), i * .025, .155, .04);
   if (o.logo) box(g, .02, .014, .006, o.logo, -.025, .23, .04);
   if (o.print) box(g, o.print.w, o.print.h, .006, o.print.c, o.print.x || 0, .2, .04);
   if (o.lanyard){ const l1 = box(g, .005, .1, .005, o.lanyard, -.016, .18, .042); l1.rotation.z = -.3; const l2 = box(g, .005, .1, .005, o.lanyard, .016, .18, .042); l2.rotation.z = .3;
@@ -1039,6 +1046,9 @@ function character(o){
     box(head, .03, .02, .004, '#F4ECDD', 0, .06, .072);
     box(head, .02, .03, .04, H, -.064, -.02, .01); box(head, .02, .03, .04, H, .064, -.02, .01);
   }
+  if (o.hairStyle === 'bowl'){ const c = ball(head, .074, H, 0, .024, -.006, 1); c.scale.set(1.06, .82, 1.04);
+    box(head, .13, .03, .03, H, 0, .03, .05); box(head, .022, .05, .07, H, -.066, -.02, -.005); box(head, .022, .05, .07, H, .066, -.02, -.005); }
+  if (o.hoops) for (const x of [-.068, .068]){ const h = mesh(head, new THREE.TorusGeometry(.012, .0025, 4, 10), '#D9D4CA', x, -.03, .01); h.rotation.y = Math.PI / 2; h.castShadow = false; }
   if (o.hairStyle === 'buzz'){ const c = ball(head, .068, H, 0, .018, -.008, 1); c.scale.set(1, .62, 1); }
   if (o.glasses){
     const gm = M('#2A2420');
@@ -1102,6 +1112,8 @@ function posePose(c, t){
     case 'goggles': L.rotation.set(-2.75, 0, .55); R.rotation.set(-2.75, 0, -.55); c.head.rotation.x = Math.sin(t * 3) * .08; break;
     case 'cross': L.rotation.set(-1.2, 0, .85); R.rotation.set(-1.35, 0, -.85); break;
     case 'laptop': L.rotation.set(-1.25, 0, .35); R.rotation.set(-2.75, 0, -.85 + Math.sin(t * 5) * .1); c.head.rotation.x = .38; break;
+    case 'doublepeace': L.rotation.set(0, 0, 2.5 + Math.sin(t * 6) * .1); R.rotation.set(0, 0, -2.5 - Math.sin(t * 6) * .1); break;
+    case 'kickpeace': L.rotation.set(0, 0, 0); R.rotation.set(0, 0, -2.5 + Math.sin(t * 6) * .12); c.legs[0].rotation.x = 1.1; c.legs[1].rotation.x = 0; break;
     case 'peace': L.rotation.set(0, 0, 0); R.rotation.set(0, 0, -2.5 + Math.sin(t * 6) * .12); break;
     default: L.rotation.set(0, 0, 0); R.rotation.set(0, 0, -2.6 + Math.sin(t * 8) * .35);
   }
